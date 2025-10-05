@@ -1,6 +1,6 @@
 # prostata
 
-A Python library for tracking statistics with timers, counters, ratios, and attributes.
+A Python library for PROcessing STATistics with timers, counters, ratios, and attributes.
 
 ## Installation
 
