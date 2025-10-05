@@ -19,3 +19,6 @@ classifiers = [
 Homepage = "https://github.com/merlos/prostata"
 Repository = "https://github.com/merlos/prostata"
 Issues = "https://github.com/merlos/prostata/issues"
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov"]

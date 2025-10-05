@@ -63,6 +63,12 @@ class TestStats:
         with pytest.raises(NameNotExists):
             stats.set_ratio("my_ratio", "num", "den")
 
+    def test_set_ratio_nonexistent_den(self):
+        stats = Stats()
+        stats.set_counter("num")
+        with pytest.raises(NameNotExists):
+            stats.set_ratio("my_ratio", "num", "den")
+
     def test_set_attribute(self):
         stats = Stats()
         stats.set_attribute("my_attr", "value")
@@ -189,10 +195,20 @@ class TestStats:
         with pytest.raises(NameNotExists):
             stats.start_timer("nonexistent")
         with pytest.raises(NameNotExists):
+            stats.stop_timer("nonexistent")
+        with pytest.raises(NameNotExists):
             stats.get_counter("nonexistent")
         with pytest.raises(NameNotExists):
             stats.incr("nonexistent")
         with pytest.raises(NameNotExists):
+            stats.decr("nonexistent")
+        with pytest.raises(NameNotExists):
+            stats.reset_counter("nonexistent")
+        with pytest.raises(NameNotExists):
+            stats.set_counter_unit("nonexistent", "unit")
+        with pytest.raises(NameNotExists):
             stats.get_ratio("nonexistent")
         with pytest.raises(NameNotExists):
             stats.get_attribute("nonexistent")
+        with pytest.raises(NameNotExists):
+            stats.set_attribute_value("nonexistent", "value")

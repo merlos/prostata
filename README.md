@@ -129,11 +129,17 @@ stats.set_status("running")
 To install in development mode:
 
 ```bash
-pip install -e .
+pip install -e .[dev]
 ```
 
 To run tests:
 
 ```bash
 python -m pytest
+```
+
+To run tests with coverage:
+
+```bash
+python -m pytest --cov=prostata --cov-report term-missing
 ```
