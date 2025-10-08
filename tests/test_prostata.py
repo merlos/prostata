@@ -267,6 +267,50 @@ class TestStats:
         assert attributes["attr1"] == "value1"
         assert attributes["attr2"] == 42
 
+    def test_timer_names(self):
+        stats = Stats()
+        stats.set_timer("timer1")
+        stats.set_timer("timer2")
+        assert stats.timer_names() == ["timer1", "timer2"]
+
+    def test_counter_names(self):
+        stats = Stats()
+        stats.set_counter("counter1")
+        stats.set_counter("counter2")
+        assert stats.counter_names() == ["counter1", "counter2"]
+
+    def test_ratio_names(self):
+        stats = Stats()
+        stats.set_counter("num")
+        stats.set_counter("den")
+        stats.set_ratio("ratio1", "num", "den")
+        stats.set_ratio("ratio2", "num", "den")
+        assert stats.ratio_names() == ["ratio1", "ratio2"]
+
+    def test_attribute_names(self):
+        stats = Stats()
+        stats.set_attribute("attr1", "value")
+        stats.set_attribute("attr2", 42)
+        assert stats.attribute_names() == ["attr1", "attr2"]
+
+    def test_used_names(self):
+        stats = Stats()
+        stats.set_timer("timer1")
+        stats.set_counter("counter1")
+        stats.set_attribute("attr1", "value")
+        stats.set_counter("num")
+        stats.set_counter("den")
+        stats.set_ratio("ratio1", "num", "den")
+        # Should include all names
+        used = stats.used_names()
+        assert "timer1" in used
+        assert "counter1" in used
+        assert "attr1" in used
+        assert "num" in used
+        assert "den" in used
+        assert "ratio1" in used
+        assert len(used) == 6
+
     def test_dynamic_methods(self):
         stats = Stats()
         stats.set_timer("timer1")

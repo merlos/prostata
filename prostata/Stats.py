@@ -376,3 +376,48 @@ class Stats:
             dict: A copy of the attributes dictionary.
         """
         return self._attributes.copy()
+
+    def timer_names(self) -> list:
+        """
+        Get the list of timer names.
+
+        Returns:
+            list: A list of timer names.
+        """
+        return list(self._timers.keys())
+
+    def counter_names(self) -> list:
+        """
+        Get the list of counter names.
+
+        Returns:
+            list: A list of counter names.
+        """
+        return list(self._counters.keys())
+
+    def ratio_names(self) -> list:
+        """
+        Get the list of ratio names.
+
+        Returns:
+            list: A list of ratio names.
+        """
+        return list(self._ratios.keys())
+
+    def attribute_names(self) -> list:
+        """
+        Get the list of attribute names.
+
+        Returns:
+            list: A list of attribute names.
+        """
+        return list(self._attributes.keys())
+
+    def used_names(self) -> list:
+        """
+        Get the list of all used names.
+
+        Returns:
+            list: A list of all used names across timers, counters, ratios, and attributes.
+        """
+        return list(self._names_used)
