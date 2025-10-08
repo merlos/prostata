@@ -26,34 +26,49 @@ stats.set_counter("errors", 0, "count")
 # Create an attribute
 stats.set_attribute("version", "1.0.0")
 
+# names cannot be repeated across timer, counters and attributes.
+
 # Start timing
-stats.start_timer("response_time")
+
+stats.start_response_time()  
+# Equivalent to 
+# stats.start_timer("response_time")
+
 
 # Simulate some work
 import time
 time.sleep(0.1)
 
-# Increment counters
-stats.incr("requests")
-stats.incr("errors")
+stats.incr_requests()        
+# Equivalent to 
+# stats.incr("requests")
+
+# Add 10 to errors
+stats.incr_errors(10)
+# Equivalent to
+# stats.incr("errors", 10)
 
 # Stop timing
-stats.stop_timer("response_time")
+stats.stop_response_time()
+#stats.stop_timer("response_time")
 
 # Get values
-print(f"Response time: {stats.get_timer('response_time'):.2f} seconds")
-print(f"Requests: {stats.get_counter('requests')}")
-print(f"Errors: {stats.get_counter('errors')}")
-print(f"Version: {stats.get_attribute('version')}")
+print(f"Response time: {stats.get_response_time()):.2f} seconds")
+print(f"Requests: {stats.get_requests()}")
+print(f"Errors: {stats.get_errors()}")
+print(f"Version: {stats.get_version()}")
+
+# Equivalente:
+#print(f"Response time: {stats.get_timer('response_time'):.2f} seconds")
+#print(f"Requests: {stats.get_counter('requests')}")
+#print(f"Errors: {stats.get_counter('errors')}")
+#print(f"Version: {stats.get_attribute('version')}")
 
 # Create a ratio
 stats.set_ratio("error_rate", "errors", "requests")
-print(f"Error rate: {stats.get_ratio('error_rate'):.2%}")
+print(f"Error rate: {stats.get_error_rate():.2%}")
+# print(f"Error rate: {stats.get_ratio('error_rate'):.2%}")
 
-# Use dynamic methods
-stats.start_response_time()  # equivalent to start_timer("response_time")
-stats.incr_requests()        # equivalent to incr("requests")
-print(f"Response time via dynamic method: {stats.get_response_time():.2f} seconds")
 ```
 
 ## Features
