@@ -32,6 +32,17 @@ class TestStats:
         with pytest.raises(NameNotAllowed):
             stats.set_timer("timer")
 
+    def test_set_timer_invalid_name(self):
+        stats = Stats()
+        with pytest.raises(NameNotAllowed):
+            stats.set_timer("Timer")
+        with pytest.raises(NameNotAllowed):
+            stats.set_timer("my-timer")
+        with pytest.raises(NameNotAllowed):
+            stats.set_timer("my timer")
+        with pytest.raises(NameNotAllowed):
+            stats.set_timer("my@timer")
+
     def test_set_timer_existing_name(self):
         stats = Stats()
         stats.set_counter("test")
@@ -49,6 +60,20 @@ class TestStats:
         stats.set_counter("my_counter")
         assert stats._counters["my_counter"] == {'value': 0, 'unit': "item"}
 
+    def test_set_counter_forbidden_name(self):
+        stats = Stats()
+        with pytest.raises(NameNotAllowed):
+            stats.set_counter("counter")
+
+    def test_set_counter_invalid_name(self):
+        stats = Stats()
+        with pytest.raises(NameNotAllowed):
+            stats.set_counter("Counter")
+        with pytest.raises(NameNotAllowed):
+            stats.set_counter("my-counter")
+        with pytest.raises(NameNotAllowed):
+            stats.set_counter("my counter")
+
     def test_set_ratio(self):
         stats = Stats()
         stats.set_counter("num")
@@ -56,6 +81,22 @@ class TestStats:
         stats.set_ratio("my_ratio", "num", "den")
         assert "my_ratio" in stats._ratios
         assert stats._ratios["my_ratio"] == {'numerator': "num", 'denominator': "den", 'value': 0.0}
+
+    def test_set_ratio_forbidden_name(self):
+        stats = Stats()
+        stats.set_counter("num")
+        stats.set_counter("den")
+        with pytest.raises(NameNotAllowed):
+            stats.set_ratio("ratio", "num", "den")
+
+    def test_set_ratio_invalid_name(self):
+        stats = Stats()
+        stats.set_counter("num")
+        stats.set_counter("den")
+        with pytest.raises(NameNotAllowed):
+            stats.set_ratio("Ratio", "num", "den")
+        with pytest.raises(NameNotAllowed):
+            stats.set_ratio("my-ratio", "num", "den")
 
     def test_set_ratio_nonexistent_num(self):
         stats = Stats()
@@ -82,6 +123,18 @@ class TestStats:
         assert stats._attributes["str_attr"] == "string"
         assert stats._attributes["int_attr"] == 42
         assert stats._attributes["float_attr"] == 3.14
+
+    def test_set_attribute_forbidden_name(self):
+        stats = Stats()
+        with pytest.raises(NameNotAllowed):
+            stats.set_attribute("attribute", "value")
+
+    def test_set_attribute_invalid_name(self):
+        stats = Stats()
+        with pytest.raises(NameNotAllowed):
+            stats.set_attribute("Attribute", "value")
+        with pytest.raises(NameNotAllowed):
+            stats.set_attribute("my-attribute", "value")
 
     def test_get_timer_not_started(self):
         stats = Stats()

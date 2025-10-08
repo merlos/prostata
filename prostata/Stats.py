@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Union
+import re
 
 
 class NameNotAllowed(Exception):
@@ -36,11 +37,31 @@ class Stats:
         return name in self._names_used
 
     def _check_name_allowed(self, name: str):
+        """
+        Check if the name is allowed (not a reserved word and valid format).
+        Args:
+            name (str): The name to check.
+        Returns:
+            None
+        Raises:
+            NameNotAllowed: If the name is a reserved word or has invalid format.
+        """
         forbidden = ["timer", "counter", "ratio", "attribute"]
         if name in forbidden:
-            raise NameNotAllowed(f"Name '{name}' is not allowed as it is a reserved word.")
+            raise NameNotAllowed(f"Name '{name}' is not allowed as it is a reserved word (timer, counter, ratio, attribute are reserved).")
+        if not re.match(r'^[a-z0-9_]+$', name):
+            raise NameNotAllowed(f"Name '{name}' contains invalid characters. Only lowercase letters, digits, and underscores are allowed.")
 
     def _check_name_unique(self, name: str):
+        """ 
+        Check if the name is unique across timers, counters, ratios, and attributes.
+        Args:
+            name (str): The name to check.
+        Returns:
+            None
+        Raises:
+            NameExists: If the name is already used.
+        """
         if self.is_used(name):
             raise NameExists(f"Name '{name}' already exists. Names cannot be repeated across timers, counters, ratios, and attributes.")
 
@@ -52,7 +73,7 @@ class Stats:
             name (str): The name of the timer.
 
         Raises:
-            NameNotAllowed: If the name is a reserved word.
+            NameNotAllowed: If the name is a reserved word or has invalid format.
             NameExists: If the name is already used.
         """
         self._check_name_allowed(name)
@@ -74,7 +95,7 @@ class Stats:
             unit (str): The unit of the counter. Defaults to "item".
 
         Raises:
-            NameNotAllowed: If the name is a reserved word.
+            NameNotAllowed: If the name is a reserved word or has invalid format.
             NameExists: If the name is already used.
         """
         self._check_name_allowed(name)
@@ -97,7 +118,7 @@ class Stats:
             denominator (str): The name of the denominator counter.
 
         Raises:
-            NameNotAllowed: If the name is a reserved word.
+            NameNotAllowed: If the name is a reserved word or has invalid format.
             NameExists: If the name is already used.
             NameNotExists: If numerator or denominator do not exist.
         """
@@ -121,7 +142,7 @@ class Stats:
             value (Union[str, int, float]): The value of the attribute. Defaults to "".
 
         Raises:
-            NameNotAllowed: If the name is a reserved word.
+            NameNotAllowed: If the name is a reserved word or has invalid format.
             NameExists: If the name is already used.
         """
         self._check_name_allowed(name)
