@@ -26,27 +26,20 @@ stats.set_counter("errors", 0, "count")
 # Create an attribute
 stats.set_attribute("version", "1.0.0")
 
-# names cannot be repeated across timer, counters and attributes.
-
 # Start timing
-
 stats.start_response_time()  
-# Equivalent to 
-# stats.start_timer("response_time")
-
+# Equivalent to stats.start_timer("response_time")
 
 # Simulate some work
 import time
 time.sleep(0.1)
 
 stats.incr_requests()        
-# Equivalent to 
-# stats.incr("requests")
+# Equivalent to stats.incr("requests")
 
 # Add 10 to errors
 stats.incr_errors(10)
-# Equivalent to
-# stats.incr("errors", 10)
+# Equivalent to stats.incr("errors", 10)
 
 # Stop timing
 stats.stop_response_time()
@@ -58,7 +51,7 @@ print(f"Requests: {stats.get_requests()}")
 print(f"Errors: {stats.get_errors()}")
 print(f"Version: {stats.get_version()}")
 
-# Equivalente:
+# Equivalent:
 #print(f"Response time: {stats.get_timer('response_time'):.2f} seconds")
 #print(f"Requests: {stats.get_counter('requests')}")
 #print(f"Errors: {stats.get_counter('errors')}")
@@ -129,13 +122,14 @@ stats.set_status("running")
 
 ### Name Validation
 - Names must be unique across all stat types
-- Reserved words: "timer", "counter", "ratio", "attribute"
+- Names can only contain lowercase letters, digits and underscore (i.e [a-z0-9_])
+- Names cannot use reserved words: "timer" "timers", "counter", "counters" "ratio", "ratios", "attribute" and "attributes"
 - Raises `NameExists` if name is already used
-- Raises `NameNotAllowed` for reserved words
+- Raises `NameNotAllowed` for reserved words or invalid names
 
 ## Exceptions
 
-- `NameNotAllowed`: When using reserved names
+- `NameNotAllowed`: When using reserved or incorrect format names
 - `NameExists`: When name is already in use
 - `NameNotExists`: When accessing non-existent stats
 
