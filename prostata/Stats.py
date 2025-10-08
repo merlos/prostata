@@ -46,7 +46,7 @@ class Stats:
         Raises:
             NameNotAllowed: If the name is a reserved word or has invalid format.
         """
-        forbidden = ["timer", "counter", "ratio", "attribute"]
+        forbidden = ["timer", "counter", "ratio", "attribute", "timers", "counters", "ratios", "attributes"]
         if name in forbidden:
             raise NameNotAllowed(f"Name '{name}' is not allowed as it is a reserved word (timer, counter, ratio, attribute are reserved).")
         if not re.match(r'^[a-z0-9_]+$', name):
@@ -340,3 +340,39 @@ class Stats:
         if name not in self._attributes:
             raise NameNotExists(f"Attribute '{name}' does not exist.")
         self._attributes[name] = value
+
+    def get_timers(self) -> dict:
+        """
+        Get all timers.
+
+        Returns:
+            dict: A copy of the timers dictionary.
+        """
+        return self._timers.copy()
+
+    def get_counters(self) -> dict:
+        """
+        Get all counters.
+
+        Returns:
+            dict: A copy of the counters dictionary.
+        """
+        return self._counters.copy()
+
+    def get_ratios(self) -> dict:
+        """
+        Get all ratios.
+
+        Returns:
+            dict: A copy of the ratios dictionary.
+        """
+        return self._ratios.copy()
+
+    def get_attributes(self) -> dict:
+        """
+        Get all attributes.
+
+        Returns:
+            dict: A copy of the attributes dictionary.
+        """
+        return self._attributes.copy()

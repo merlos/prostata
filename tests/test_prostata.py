@@ -31,6 +31,8 @@ class TestStats:
         stats = Stats()
         with pytest.raises(NameNotAllowed):
             stats.set_timer("timer")
+        with pytest.raises(NameNotAllowed):
+            stats.set_timer("timers")
 
     def test_set_timer_invalid_name(self):
         stats = Stats()
@@ -64,6 +66,8 @@ class TestStats:
         stats = Stats()
         with pytest.raises(NameNotAllowed):
             stats.set_counter("counter")
+        with pytest.raises(NameNotAllowed):
+            stats.set_counter("counters")
 
     def test_set_counter_invalid_name(self):
         stats = Stats()
@@ -88,6 +92,8 @@ class TestStats:
         stats.set_counter("den")
         with pytest.raises(NameNotAllowed):
             stats.set_ratio("ratio", "num", "den")
+        with pytest.raises(NameNotAllowed):
+            stats.set_ratio("ratios", "num", "den")
 
     def test_set_ratio_invalid_name(self):
         stats = Stats()
@@ -128,6 +134,8 @@ class TestStats:
         stats = Stats()
         with pytest.raises(NameNotAllowed):
             stats.set_attribute("attribute", "value")
+        with pytest.raises(NameNotAllowed):
+            stats.set_attribute("attributes", "value")
 
     def test_set_attribute_invalid_name(self):
         stats = Stats()
@@ -219,6 +227,45 @@ class TestStats:
         stats.set_attribute("my_attr", "initial")
         stats.set_attribute_value("my_attr", "updated")
         assert stats.get_attribute("my_attr") == "updated"
+
+    def test_get_timers(self):
+        stats = Stats()
+        stats.set_timer("timer1")
+        stats.set_timer("timer2")
+        timers = stats.get_timers()
+        assert "timer1" in timers
+        assert "timer2" in timers
+        assert len(timers) == 2
+
+    def test_get_counters(self):
+        stats = Stats()
+        stats.set_counter("counter1", 10)
+        stats.set_counter("counter2", 20)
+        counters = stats.get_counters()
+        assert "counter1" in counters
+        assert "counter2" in counters
+        assert counters["counter1"]["value"] == 10
+        assert counters["counter2"]["value"] == 20
+
+    def test_get_ratios(self):
+        stats = Stats()
+        stats.set_counter("num")
+        stats.set_counter("den")
+        stats.set_ratio("ratio1", "num", "den")
+        ratios = stats.get_ratios()
+        assert "ratio1" in ratios
+        assert ratios["ratio1"]["numerator"] == "num"
+        assert ratios["ratio1"]["denominator"] == "den"
+
+    def test_get_attributes(self):
+        stats = Stats()
+        stats.set_attribute("attr1", "value1")
+        stats.set_attribute("attr2", 42)
+        attributes = stats.get_attributes()
+        assert "attr1" in attributes
+        assert "attr2" in attributes
+        assert attributes["attr1"] == "value1"
+        assert attributes["attr2"] == 42
 
     def test_dynamic_methods(self):
         stats = Stats()
