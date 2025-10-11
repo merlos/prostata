@@ -29,33 +29,41 @@ stats.set_counter("errors", 0, "count")
 stats.set_attribute("version", "1.0.0")
 
 # Start timing
-stats.start_timer("response_time")
+stats.start_response_time()  
+# Equivalent to stats.start_timer("response_time")
 
 # Simulate some work
 import time
 time.sleep(0.1)
 
-# Increment counters
-stats.incr("requests")
-stats.incr("errors")
+stats.incr_requests()        
+# Equivalent to stats.incr("requests")
+
+# Add 10 to errors
+stats.incr_errors(10)
+# Equivalent to stats.incr("errors", 10)
 
 # Stop timing
-stats.stop_timer("response_time")
+stats.stop_response_time()
+#stats.stop_timer("response_time")
 
 # Get values
-print(f"Response time: {stats.get_timer('response_time'):.2f} seconds")
-print(f"Requests: {stats.get_counter('requests')}")
-print(f"Errors: {stats.get_counter('errors')}")
-print(f"Version: {stats.get_attribute('version')}")
+print(f"Response time: {stats.get_response_time()):.2f} seconds")
+print(f"Requests: {stats.get_requests()}")
+print(f"Errors: {stats.get_errors()}")
+print(f"Version: {stats.get_version()}")
+
+# Equivalent:
+#print(f"Response time: {stats.get_timer('response_time'):.2f} seconds")
+#print(f"Requests: {stats.get_counter('requests')}")
+#print(f"Errors: {stats.get_counter('errors')}")
+#print(f"Version: {stats.get_attribute('version')}")
 
 # Create a ratio
 stats.set_ratio("error_rate", "errors", "requests")
-print(f"Error rate: {stats.get_ratio('error_rate'):.2%}")
+print(f"Error rate: {stats.get_error_rate():.2%}")
+# print(f"Error rate: {stats.get_ratio('error_rate'):.2%}")
 
-# Use dynamic methods
-stats.start_response_time()  # equivalent to start_timer("response_time")
-stats.incr_requests()        # equivalent to incr("requests")
-print(f"Response time via dynamic method: {stats.get_response_time():.2f} seconds")
 ```
 
 ## Features
@@ -116,13 +124,14 @@ stats.set_status("running")
 
 ### Name Validation
 - Names must be unique across all stat types
-- Reserved words: "timer", "counter", "ratio", "attribute"
+- Names can only contain lowercase letters, digits and underscore (i.e [a-z0-9_])
+- Names cannot use reserved words: "timer" "timers", "counter", "counters" "ratio", "ratios", "attribute" and "attributes"
 - Raises `NameExists` if name is already used
-- Raises `NameNotAllowed` for reserved words
+- Raises `NameNotAllowed` for reserved words or invalid names
 
 ## Exceptions
 
-- `NameNotAllowed`: When using reserved names
+- `NameNotAllowed`: When using reserved or incorrect format names
 - `NameExists`: When name is already in use
 - `NameNotExists`: When accessing non-existent stats
 

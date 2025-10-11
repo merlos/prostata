@@ -31,6 +31,19 @@ class TestStats:
         stats = Stats()
         with pytest.raises(NameNotAllowed):
             stats.set_timer("timer")
+        with pytest.raises(NameNotAllowed):
+            stats.set_timer("timers")
+
+    def test_set_timer_invalid_name(self):
+        stats = Stats()
+        with pytest.raises(NameNotAllowed):
+            stats.set_timer("Timer")
+        with pytest.raises(NameNotAllowed):
+            stats.set_timer("my-timer")
+        with pytest.raises(NameNotAllowed):
+            stats.set_timer("my timer")
+        with pytest.raises(NameNotAllowed):
+            stats.set_timer("my@timer")
 
     def test_set_timer_existing_name(self):
         stats = Stats()
@@ -49,6 +62,22 @@ class TestStats:
         stats.set_counter("my_counter")
         assert stats._counters["my_counter"] == {'value': 0, 'unit': "item"}
 
+    def test_set_counter_forbidden_name(self):
+        stats = Stats()
+        with pytest.raises(NameNotAllowed):
+            stats.set_counter("counter")
+        with pytest.raises(NameNotAllowed):
+            stats.set_counter("counters")
+
+    def test_set_counter_invalid_name(self):
+        stats = Stats()
+        with pytest.raises(NameNotAllowed):
+            stats.set_counter("Counter")
+        with pytest.raises(NameNotAllowed):
+            stats.set_counter("my-counter")
+        with pytest.raises(NameNotAllowed):
+            stats.set_counter("my counter")
+
     def test_set_ratio(self):
         stats = Stats()
         stats.set_counter("num")
@@ -56,6 +85,24 @@ class TestStats:
         stats.set_ratio("my_ratio", "num", "den")
         assert "my_ratio" in stats._ratios
         assert stats._ratios["my_ratio"] == {'numerator': "num", 'denominator': "den", 'value': 0.0}
+
+    def test_set_ratio_forbidden_name(self):
+        stats = Stats()
+        stats.set_counter("num")
+        stats.set_counter("den")
+        with pytest.raises(NameNotAllowed):
+            stats.set_ratio("ratio", "num", "den")
+        with pytest.raises(NameNotAllowed):
+            stats.set_ratio("ratios", "num", "den")
+
+    def test_set_ratio_invalid_name(self):
+        stats = Stats()
+        stats.set_counter("num")
+        stats.set_counter("den")
+        with pytest.raises(NameNotAllowed):
+            stats.set_ratio("Ratio", "num", "den")
+        with pytest.raises(NameNotAllowed):
+            stats.set_ratio("my-ratio", "num", "den")
 
     def test_set_ratio_nonexistent_num(self):
         stats = Stats()
@@ -82,6 +129,20 @@ class TestStats:
         assert stats._attributes["str_attr"] == "string"
         assert stats._attributes["int_attr"] == 42
         assert stats._attributes["float_attr"] == 3.14
+
+    def test_set_attribute_forbidden_name(self):
+        stats = Stats()
+        with pytest.raises(NameNotAllowed):
+            stats.set_attribute("attribute", "value")
+        with pytest.raises(NameNotAllowed):
+            stats.set_attribute("attributes", "value")
+
+    def test_set_attribute_invalid_name(self):
+        stats = Stats()
+        with pytest.raises(NameNotAllowed):
+            stats.set_attribute("Attribute", "value")
+        with pytest.raises(NameNotAllowed):
+            stats.set_attribute("my-attribute", "value")
 
     def test_get_timer_not_started(self):
         stats = Stats()
@@ -166,6 +227,89 @@ class TestStats:
         stats.set_attribute("my_attr", "initial")
         stats.set_attribute_value("my_attr", "updated")
         assert stats.get_attribute("my_attr") == "updated"
+
+    def test_get_timers(self):
+        stats = Stats()
+        stats.set_timer("timer1")
+        stats.set_timer("timer2")
+        timers = stats.get_timers()
+        assert "timer1" in timers
+        assert "timer2" in timers
+        assert len(timers) == 2
+
+    def test_get_counters(self):
+        stats = Stats()
+        stats.set_counter("counter1", 10)
+        stats.set_counter("counter2", 20)
+        counters = stats.get_counters()
+        assert "counter1" in counters
+        assert "counter2" in counters
+        assert counters["counter1"]["value"] == 10
+        assert counters["counter2"]["value"] == 20
+
+    def test_get_ratios(self):
+        stats = Stats()
+        stats.set_counter("num")
+        stats.set_counter("den")
+        stats.set_ratio("ratio1", "num", "den")
+        ratios = stats.get_ratios()
+        assert "ratio1" in ratios
+        assert ratios["ratio1"]["numerator"] == "num"
+        assert ratios["ratio1"]["denominator"] == "den"
+
+    def test_get_attributes(self):
+        stats = Stats()
+        stats.set_attribute("attr1", "value1")
+        stats.set_attribute("attr2", 42)
+        attributes = stats.get_attributes()
+        assert "attr1" in attributes
+        assert "attr2" in attributes
+        assert attributes["attr1"] == "value1"
+        assert attributes["attr2"] == 42
+
+    def test_timer_names(self):
+        stats = Stats()
+        stats.set_timer("timer1")
+        stats.set_timer("timer2")
+        assert stats.timer_names() == ["timer1", "timer2"]
+
+    def test_counter_names(self):
+        stats = Stats()
+        stats.set_counter("counter1")
+        stats.set_counter("counter2")
+        assert stats.counter_names() == ["counter1", "counter2"]
+
+    def test_ratio_names(self):
+        stats = Stats()
+        stats.set_counter("num")
+        stats.set_counter("den")
+        stats.set_ratio("ratio1", "num", "den")
+        stats.set_ratio("ratio2", "num", "den")
+        assert stats.ratio_names() == ["ratio1", "ratio2"]
+
+    def test_attribute_names(self):
+        stats = Stats()
+        stats.set_attribute("attr1", "value")
+        stats.set_attribute("attr2", 42)
+        assert stats.attribute_names() == ["attr1", "attr2"]
+
+    def test_used_names(self):
+        stats = Stats()
+        stats.set_timer("timer1")
+        stats.set_counter("counter1")
+        stats.set_attribute("attr1", "value")
+        stats.set_counter("num")
+        stats.set_counter("den")
+        stats.set_ratio("ratio1", "num", "den")
+        # Should include all names
+        used = stats.used_names()
+        assert "timer1" in used
+        assert "counter1" in used
+        assert "attr1" in used
+        assert "num" in used
+        assert "den" in used
+        assert "ratio1" in used
+        assert len(used) == 6
 
     def test_dynamic_methods(self):
         stats = Stats()

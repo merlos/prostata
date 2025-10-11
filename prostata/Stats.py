@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Union
+import re
 
 
 class NameNotAllowed(Exception):
@@ -36,11 +37,31 @@ class Stats:
         return name in self._names_used
 
     def _check_name_allowed(self, name: str):
-        forbidden = ["timer", "counter", "ratio", "attribute"]
+        """
+        Check if the name is allowed (not a reserved word and valid format).
+        Args:
+            name (str): The name to check.
+        Returns:
+            None
+        Raises:
+            NameNotAllowed: If the name is a reserved word or has invalid format.
+        """
+        forbidden = ["timer", "counter", "ratio", "attribute", "timers", "counters", "ratios", "attributes"]
         if name in forbidden:
-            raise NameNotAllowed(f"Name '{name}' is not allowed as it is a reserved word.")
+            raise NameNotAllowed(f"Name '{name}' is not allowed as it is a reserved word (timer, counter, ratio, attribute are reserved).")
+        if not re.match(r'^[a-z0-9_]+$', name):
+            raise NameNotAllowed(f"Name '{name}' contains invalid characters. Only lowercase letters, digits, and underscores are allowed.")
 
     def _check_name_unique(self, name: str):
+        """ 
+        Check if the name is unique across timers, counters, ratios, and attributes.
+        Args:
+            name (str): The name to check.
+        Returns:
+            None
+        Raises:
+            NameExists: If the name is already used.
+        """
         if self.is_used(name):
             raise NameExists(f"Name '{name}' already exists. Names cannot be repeated across timers, counters, ratios, and attributes.")
 
@@ -52,7 +73,7 @@ class Stats:
             name (str): The name of the timer.
 
         Raises:
-            NameNotAllowed: If the name is a reserved word.
+            NameNotAllowed: If the name is a reserved word or has invalid format.
             NameExists: If the name is already used.
         """
         self._check_name_allowed(name)
@@ -74,7 +95,7 @@ class Stats:
             unit (str): The unit of the counter. Defaults to "item".
 
         Raises:
-            NameNotAllowed: If the name is a reserved word.
+            NameNotAllowed: If the name is a reserved word or has invalid format.
             NameExists: If the name is already used.
         """
         self._check_name_allowed(name)
@@ -97,7 +118,7 @@ class Stats:
             denominator (str): The name of the denominator counter.
 
         Raises:
-            NameNotAllowed: If the name is a reserved word.
+            NameNotAllowed: If the name is a reserved word or has invalid format.
             NameExists: If the name is already used.
             NameNotExists: If numerator or denominator do not exist.
         """
@@ -121,7 +142,7 @@ class Stats:
             value (Union[str, int, float]): The value of the attribute. Defaults to "".
 
         Raises:
-            NameNotAllowed: If the name is a reserved word.
+            NameNotAllowed: If the name is a reserved word or has invalid format.
             NameExists: If the name is already used.
         """
         self._check_name_allowed(name)
@@ -319,3 +340,84 @@ class Stats:
         if name not in self._attributes:
             raise NameNotExists(f"Attribute '{name}' does not exist.")
         self._attributes[name] = value
+
+    def get_timers(self) -> dict:
+        """
+        Get all timers.
+
+        Returns:
+            dict: A copy of the timers dictionary.
+        """
+        return self._timers.copy()
+
+    def get_counters(self) -> dict:
+        """
+        Get all counters.
+
+        Returns:
+            dict: A copy of the counters dictionary.
+        """
+        return self._counters.copy()
+
+    def get_ratios(self) -> dict:
+        """
+        Get all ratios.
+
+        Returns:
+            dict: A copy of the ratios dictionary.
+        """
+        return self._ratios.copy()
+
+    def get_attributes(self) -> dict:
+        """
+        Get all attributes.
+
+        Returns:
+            dict: A copy of the attributes dictionary.
+        """
+        return self._attributes.copy()
+
+    def timer_names(self) -> list:
+        """
+        Get the list of timer names.
+
+        Returns:
+            list: A list of timer names.
+        """
+        return list(self._timers.keys())
+
+    def counter_names(self) -> list:
+        """
+        Get the list of counter names.
+
+        Returns:
+            list: A list of counter names.
+        """
+        return list(self._counters.keys())
+
+    def ratio_names(self) -> list:
+        """
+        Get the list of ratio names.
+
+        Returns:
+            list: A list of ratio names.
+        """
+        return list(self._ratios.keys())
+
+    def attribute_names(self) -> list:
+        """
+        Get the list of attribute names.
+
+        Returns:
+            list: A list of attribute names.
+        """
+        return list(self._attributes.keys())
+
+    def used_names(self) -> list:
+        """
+        Get the list of all used names.
+
+        Returns:
+            list: A list of all used names across timers, counters, ratios, and attributes.
+        """
+        return list(self._names_used)
