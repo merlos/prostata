@@ -5,13 +5,23 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "prostata"
 version = "0.1.0"
-description = "A Python library for prostate-related calculations"
+description = "A Python library for tracking statistics with timers, counters, ratios, and attributes"
 authors = [{name = "merlos", email = "merlos@example.com"}]
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
-    "Programming Language :: Python :: 3",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent",
 ]
 
