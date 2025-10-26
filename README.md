@@ -1,5 +1,7 @@
 # prostata
 
+[![PyPI version](https://badge.fury.io/py/prostata.svg)](https://pypi.org/project/prostata/)
+
 A Python library for PROcessing STATistics with timers, counters, ratios, and attributes.
 
 ## Installation
@@ -151,4 +153,32 @@ To run tests with coverage:
 
 ```bash
 python -m pytest --cov=prostata --cov-report term-missing
+```
+
+## Publishing
+
+### GitHub Actions
+
+To publish a new release to PyPI:
+1. Create a new release on GitHub with a version tag (e.g., `v0.1.0`)
+2. The GitHub Action will automatically build and publish the package to PyPI
+
+Add `PYPI_API_TOKEN` as a repository secret.  
+
+### Manual (Command Line)
+
+Alternatively, you can publish manually using the provided script. Make sure you're in an activated virtual environment with the necessary tools installed:
+
+```bash
+# Activate virtual environment (if not already active)
+source .venv/bin/activate
+
+# For production PyPI
+PYPI_API_TOKEN=your_token_here ./bin/release.sh
+
+# For Test PyPI (recommended first)
+TEST_PYPI_API_TOKEN=your_test_token_here ./bin/release.sh --test
+
+# Skip confirmations (useful for automation)
+TEST_PYPI_API_TOKEN=your_test_token_here ./bin/release.sh --test -y
 ```
