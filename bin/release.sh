@@ -1,8 +1,16 @@
 #!/bin/bash
 
 # Release script for prostata package to PyPI
-# Usage: ./bin/release.sh [--test] [--help]
-
+#
+# Usage: 
+# Set the PYPI_API_TOKEN environment variable for production releases or the TEST_PYPI_API_TOKEN environment variable for test releases.
+# Example: 
+#   export PYPI_API_TOKEN="pypi-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+#   export TEST_PYPI_API_TOKEN="pypi-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+# 
+# ./bin/release.sh [--test] [-y] [--help]
+# 
+# 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
