@@ -209,3 +209,40 @@ TEST_PYPI_API_TOKEN=your_test_token_here ./bin/release.sh --test
 # Skip confirmations (useful for automation)
 TEST_PYPI_API_TOKEN=your_test_token_here ./bin/release.sh --test -y
 ```
+
+## Documentation
+
+The documentation is built using MkDocs with the Material theme.
+
+### Building Documentation
+
+To build the documentation locally:
+
+```bash
+# Install development dependencies (includes MkDocs)
+pip install -e .[dev]
+
+# Build the documentation
+mkdocs build
+
+# The built site will be in the `site/` directory
+```
+
+### Serving Documentation Locally
+
+To serve the documentation with live reload during development:
+
+```bash
+# Start the development server
+mkdocs serve
+
+# Open http://localhost:8000 in your browser
+```
+
+### Documentation Structure
+
+- **User Guide**: Step-by-step guides for using prostata features
+- **API Reference**: Complete API documentation with examples
+- **Development**: Contributing guidelines and testing information
+
+The documentation is automatically deployed to GitHub Pages on the main branch.

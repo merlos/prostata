@@ -31,4 +31,4 @@ Repository = "https://github.com/merlos/prostata"
 Issues = "https://github.com/merlos/prostata/issues"
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-cov"]
+dev = ["pytest", "pytest-cov", "mkdocs", "mkdocs-material", "mkdocstrings[python]"]
