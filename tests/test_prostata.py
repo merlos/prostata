@@ -24,8 +24,14 @@ class TestStats:
         stats = Stats()
         stats.set_timer("my_timer")
         assert "my_timer" in stats._timers
-        assert stats._timers["my_timer"] == {'start': None, 'stop': None, 'segments': 0, 'elapsed': 0.0}
+        assert stats._timers["my_timer"] == {'start': None, 'stop': None, 'segments': 0, 'elapsed': 0.0, 'label': 'my_timer'}
         assert "my_timer" in stats._names_used
+
+    def test_set_timer_with_label(self):
+        stats = Stats()
+        stats.set_timer("my_timer", "My Timer")
+        assert "my_timer" in stats._timers
+        assert stats._timers["my_timer"]['label'] == 'My Timer'
 
     def test_set_timer_forbidden_name(self):
         stats = Stats()
@@ -55,12 +61,17 @@ class TestStats:
         stats = Stats()
         stats.set_counter("my_counter", 10, "units")
         assert "my_counter" in stats._counters
-        assert stats._counters["my_counter"] == {'value': 10, 'unit': "units"}
+        assert stats._counters["my_counter"] == {'value': 10, 'unit': "units", 'label': 'my_counter'}
 
     def test_set_counter_defaults(self):
         stats = Stats()
         stats.set_counter("my_counter")
-        assert stats._counters["my_counter"] == {'value': 0, 'unit': "item"}
+        assert stats._counters["my_counter"] == {'value': 0, 'unit': "item", 'label': 'my_counter'}
+
+    def test_set_counter_with_label(self):
+        stats = Stats()
+        stats.set_counter("my_counter", 5, "bytes", "My Counter")
+        assert stats._counters["my_counter"]['label'] == 'My Counter'
 
     def test_set_counter_forbidden_name(self):
         stats = Stats()
@@ -84,7 +95,14 @@ class TestStats:
         stats.set_counter("den")
         stats.set_ratio("my_ratio", "num", "den")
         assert "my_ratio" in stats._ratios
-        assert stats._ratios["my_ratio"] == {'numerator': "num", 'denominator': "den", 'value': 0.0}
+        assert stats._ratios["my_ratio"] == {'numerator': "num", 'denominator': "den", 'value': 0.0, 'label': 'my_ratio'}
+
+    def test_set_ratio_with_label(self):
+        stats = Stats()
+        stats.set_counter("num")
+        stats.set_counter("den")
+        stats.set_ratio("my_ratio", "num", "den", "My Ratio")
+        assert stats._ratios["my_ratio"]['label'] == 'My Ratio'
 
     def test_set_ratio_forbidden_name(self):
         stats = Stats()
@@ -119,17 +137,18 @@ class TestStats:
     def test_set_attribute(self):
         stats = Stats()
         stats.set_attribute("my_attr", "value")
-        assert stats._attributes["my_attr"] == "value"
+        assert stats._attributes["my_attr"] == {'value': 'value', 'label': 'my_attr'}
 
     def test_set_attribute_types(self):
         stats = Stats()
         stats.set_attribute("str_attr", "string")
         stats.set_attribute("int_attr", 42)
         stats.set_attribute("float_attr", 3.14)
-        assert stats._attributes["str_attr"] == "string"
-        assert stats._attributes["int_attr"] == 42
-        assert stats._attributes["float_attr"] == 3.14
+        assert stats._attributes["str_attr"]['value'] == "string"
+        assert stats._attributes["int_attr"]['value'] == 42
+        assert stats._attributes["float_attr"]['value'] == 3.14
 
+    
     def test_set_attribute_forbidden_name(self):
         stats = Stats()
         with pytest.raises(NameNotAllowed):
@@ -264,8 +283,8 @@ class TestStats:
         attributes = stats.get_attributes()
         assert "attr1" in attributes
         assert "attr2" in attributes
-        assert attributes["attr1"] == "value1"
-        assert attributes["attr2"] == 42
+        assert attributes["attr1"]["value"] == "value1"
+        assert attributes["attr2"]["value"] == 42
 
     def test_timer_names(self):
         stats = Stats()
@@ -356,3 +375,122 @@ class TestStats:
             stats.get_attribute("nonexistent")
         with pytest.raises(NameNotExists):
             stats.set_attribute_value("nonexistent", "value")
+
+    def test_set_label(self):
+        stats = Stats()
+        stats.set_timer("my_timer", "Old Label")
+        stats.set_label("my_timer", "New Label")
+        assert stats._timers["my_timer"]['label'] == "New Label"
+
+    def test_set_label_counter(self):
+        stats = Stats()
+        stats.set_counter("my_counter", label="Old Label")
+        stats.set_label("my_counter", "New Label")
+        assert stats._counters["my_counter"]['label'] == "New Label"
+
+    def test_set_label_ratio(self):
+        stats = Stats()
+        stats.set_counter("num")
+        stats.set_counter("den")
+        stats.set_ratio("my_ratio", "num", "den", "Old Label")
+        stats.set_label("my_ratio", "New Label")
+        assert stats._ratios["my_ratio"]['label'] == "New Label"
+
+    def test_set_label_attribute(self):
+        stats = Stats()
+        stats.set_attribute("my_attr", "value", "Old Label")
+        stats.set_label("my_attr", "New Label")
+        assert stats._attributes["my_attr"]['label'] == "New Label"
+
+    def test_set_label_nonexistent(self):
+        stats = Stats()
+        with pytest.raises(NameNotExists):
+            stats.set_label("nonexistent", "New Label")
+
+    def test_get_labels(self):
+        stats = Stats()
+        stats.set_timer("timer1", "Timer One")
+        stats.set_counter("counter1", label="Counter One")
+        stats.set_counter("num")
+        stats.set_counter("den")
+        stats.set_ratio("ratio1", "num", "den", "Ratio One")
+        stats.set_attribute("attr1", "value", "Attribute One")
+        
+        labels = stats.get_labels()
+        expected = {
+            "timer1": "Timer One",
+            "counter1": "Counter One",
+            "num": "num",
+            "den": "den",
+            "ratio1": "Ratio One",
+            "attr1": "Attribute One"
+        }
+        assert labels == expected
+
+    def test_get_labels_for_timers(self):
+        stats = Stats()
+        stats.set_timer("timer1", "Timer One")
+        stats.set_timer("timer2", "Timer Two")
+        stats.set_counter("counter1")  # This shouldn't appear in timer labels
+        
+        timer_labels = stats.get_labels_for_timers()
+        expected = {
+            "timer1": "Timer One",
+            "timer2": "Timer Two"
+        }
+        assert timer_labels == expected
+
+    def test_get_labels_for_counters(self):
+        stats = Stats()
+        stats.set_counter("counter1", label="Counter One")
+        stats.set_counter("counter2", label="Counter Two")
+        stats.set_timer("timer1")  # This shouldn't appear in counter labels
+        
+        counter_labels = stats.get_labels_for_counters()
+        expected = {
+            "counter1": "Counter One",
+            "counter2": "Counter Two"
+        }
+        assert counter_labels == expected
+
+    def test_get_labels_for_ratios(self):
+        stats = Stats()
+        stats.set_counter("num1")
+        stats.set_counter("den1")
+        stats.set_counter("num2")
+        stats.set_counter("den2")
+        stats.set_ratio("ratio1", "num1", "den1", "Ratio One")
+        stats.set_ratio("ratio2", "num2", "den2", "Ratio Two")
+        stats.set_timer("timer1")  # This shouldn't appear in ratio labels
+        
+        ratio_labels = stats.get_labels_for_ratios()
+        expected = {
+            "ratio1": "Ratio One",
+            "ratio2": "Ratio Two"
+        }
+        assert ratio_labels == expected
+
+    def test_get_labels_for_attributes(self):
+        stats = Stats()
+        stats.set_attribute("attr1", "value1", "Attribute One")
+        stats.set_attribute("attr2", "value2", "Attribute Two")
+        stats.set_timer("timer1")  # This shouldn't appear in attribute labels
+        
+        attr_labels = stats.get_labels_for_attributes()
+        expected = {
+            "attr1": "Attribute One",
+            "attr2": "Attribute Two"
+        }
+        assert attr_labels == expected
+
+    def test_labels_can_be_repeated(self):
+        """Test that labels can be repeated across different items"""
+        stats = Stats()
+        stats.set_timer("timer1", "Same Label")
+        stats.set_counter("counter1", label="Same Label")
+        stats.set_attribute("attr1", "value", "Same Label")
+        
+        labels = stats.get_labels()
+        assert labels["timer1"] == "Same Label"
+        assert labels["counter1"] == "Same Label"
+        assert labels["attr1"] == "Same Label"
