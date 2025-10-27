@@ -122,6 +122,33 @@ stats.incr_items()
 stats.set_status("running")
 ```
 
+### Labels
+
+Each stat can have a descriptive label (defaults to the stat name):
+
+```python
+# Custom labels
+stats.set_timer("db_query", "Database Query Time")
+stats.set_counter("requests", label="HTTP Requests")
+stats.set_attribute("version", "1.2.0", "App Version")
+
+# Default labels (same as name)
+stats.set_timer("cpu_time")  # label = "cpu_time"
+
+# Update labels
+stats.set_label("db_query", "Database Query Execution Time")
+
+# Get labels
+all_labels = stats.get_labels()
+timer_labels = stats.get_labels_for_timers()
+counter_labels = stats.get_labels_for_counters()
+ratio_labels = stats.get_labels_for_ratios()
+attr_labels = stats.get_labels_for_attributes()
+```
+
+Labels can be repeated across different stat types but names must be unique.
+
+
 ### Name Validation
 - Names must be unique across all stat types
 - Names can only contain lowercase letters, digits and underscore (i.e [a-z0-9_])
