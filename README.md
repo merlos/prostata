@@ -209,3 +209,57 @@ TEST_PYPI_API_TOKEN=your_test_token_here ./bin/release.sh --test
 # Skip confirmations (useful for automation)
 TEST_PYPI_API_TOKEN=your_test_token_here ./bin/release.sh --test -y
 ```
+
+## Documentation
+
+The documentation is built using MkDocs with the Material theme.
+
+### Building Documentation
+
+To build the documentation locally:
+
+```bash
+# Install development dependencies (includes MkDocs)
+pip install -e .[dev]
+
+# Build the documentation
+mkdocs build
+
+# The built site will be in the `site/` directory
+```
+
+### Serving Documentation Locally
+
+To serve the documentation with live reload during development:
+
+```bash
+# Start the development server
+mkdocs serve
+
+# Open http://localhost:8000 in your browser
+```
+
+### Documentation Structure
+
+The documentation is versioned using [mike](https://github.com/jimporter/mike):
+
+To work with versioned documentation locally:
+
+```bash
+# Install mike
+pip install mike
+
+# Deploy a new version (replace X.Y.Z with actual version)
+mike deploy X.Y.Z latest
+
+# List all versions
+mike list
+
+# Set default version
+mike set-default latest
+
+# Delete a version
+mike delete X.Y.Z
+```
+
+The documentation is automatically deployed to GitHub Pages on the main branch and on new releases ([.github/docs.yml](.github/docs.yml))
