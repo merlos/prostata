@@ -7,7 +7,7 @@ A Python library for PROcessing STATistics with timers, counters, ratios, and at
 ## Installation
 
 ```bash
-pip install .
+pip install prostata
 ```
 
 ## Usage
