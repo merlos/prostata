@@ -241,8 +241,25 @@ mkdocs serve
 
 ### Documentation Structure
 
-- **User Guide**: Step-by-step guides for using prostata features
-- **API Reference**: Complete API documentation with examples
-- **Development**: Contributing guidelines and testing information
+The documentation is versioned using [mike](https://github.com/jimporter/mike):
 
-The documentation is automatically deployed to GitHub Pages on the main branch.
+To work with versioned documentation locally:
+
+```bash
+# Install mike
+pip install mike
+
+# Deploy a new version (replace X.Y.Z with actual version)
+mike deploy X.Y.Z latest
+
+# List all versions
+mike list
+
+# Set default version
+mike set-default latest
+
+# Delete a version
+mike delete X.Y.Z
+```
+
+The documentation is automatically deployed to GitHub Pages on the main branch and on new releases ([.github/docs.yml](.github/docs.yml))
