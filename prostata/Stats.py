@@ -33,18 +33,36 @@ class Stats:
 
         Returns:
             bool: True if the name is used, False otherwise.
+        
+        Examples:
+            >>> stats = Stats()
+            >>> stats.set_timer("load_time")
+            >>> stats.is_used("load_time")
+            True
+            >>> stats.is_used("non_existent")
+            False
         """
         return name in self._names_used
 
     def _check_name_allowed(self, name: str):
         """
         Check if the name is allowed (not a reserved word and valid format).
+        The name must consist of lowercase letters, digits, and underscores only.
+        The reserved words are: timer, counter, ratio, attribute (and their plural forms).
+
         Args:
             name (str): The name to check.
+        
         Returns:
             None
+        
         Raises:
-            NameNotAllowed: If the name is a reserved word or has invalid format.
+            NameNotAllowed: If the name is a reserved word or has invalid format. The exception message details the reason.
+        
+        Examples:
+            >>> stats = Stats()
+            >>> stats._check_name_allowed("valid_name")  # No exception
+            >>> stats._check_name_allowed("timer")
         """
         forbidden = ["timer", "counter", "ratio", "attribute", "timers", "counters", "ratios", "attributes"]
         if name in forbidden:
@@ -61,6 +79,11 @@ class Stats:
             None
         Raises:
             NameExists: If the name is already used.
+        Examples:
+            >>> stats = Stats()
+            >>> stats.set_timer("load_time")
+            >>> stats._check_name_unique("load_time")  # Raises NameExists
+            >>> stats._check_name_unique("new_name")  # No exception
         """
         if self.is_used(name):
             raise NameExists(f"Name '{name}' already exists. Names cannot be repeated across timers, counters, ratios, and attributes.")
@@ -76,6 +99,15 @@ class Stats:
         Raises:
             NameNotAllowed: If the name is a reserved word or has invalid format.
             NameExists: If the name is already used.
+        
+        Examples:
+            >>> stats = Stats()
+            >>> stats.set_timer("load_time", label="Loading Time")
+            >>> stats.start_load_time()
+            >>> # ... some code ...
+            >>> stats.stop_load_time()
+            >>> elapsed = stats.get_load_time()
+            >>> print(f"Elapsed time: {elapsed} seconds")
         """
         self._check_name_allowed(name)
         self._check_name_unique(name)
@@ -101,6 +133,20 @@ class Stats:
         Raises:
             NameNotAllowed: If the name is a reserved word or has invalid format.
             NameExists: If the name is already used.
+        Example:
+            >>> stats = Stats()
+            >>> stats.set_counter("requests", value=10, unit="requests", label="Total Requests")
+            >>> stats.get_requests()
+            10
+            >>> stats.incr_requests(5)
+            >>> stats.get_requests()
+            15
+            >>> stats.decr_requests(3)
+            >>> stats.get_requests()
+            12
+            >>> stats.reset_requests()
+            >>> stats.get_requests()
+            0
         """
         self._check_name_allowed(name)
         self._check_name_unique(name)
@@ -128,6 +174,16 @@ class Stats:
             NameNotAllowed: If the name is a reserved word or has invalid format.
             NameExists: If the name is already used.
             NameNotExists: If numerator or denominator do not exist.
+        
+        Examples:
+            >>> stats = Stats()
+            >>> stats.set_counter("success_count")
+            >>> stats.set_counter("total_count")
+            >>> stats.set_ratio("success_rate", "success_count", "total_count", label="Success Rate")
+            >>> stats.incr_success_count(80)
+            >>> stats.incr_total_count(100)
+            >>> rate = stats.get_success_rate()
+            >>> print(f"Success Rate: {rate}")
         """
         self._check_name_allowed(name)
         self._check_name_unique(name)
@@ -154,6 +210,20 @@ class Stats:
         Raises:
             NameNotAllowed: If the name is a reserved word or has invalid format.
             NameExists: If the name is already used.
+        Examples:
+            >>> stats = Stats()
+            >>> stats.set_attribute("version", "1.0.0", label="Software Version")
+            >>> stats.get_version()
+            '1.0.0'
+            >>> stats.set_version("1.1.0")
+            >>> stats.get_version()
+            '1.1.0' 
+            >>> stats.set_attribute("build_number", 42)
+            >>> stats.get_build_number()
+            42
+            >>> stats.set_attribute("pi_value", 3.14159)
+            >>> stats.get_pi_value()
+            3.14159 
         """
         self._check_name_allowed(name)
         self._check_name_unique(name)
