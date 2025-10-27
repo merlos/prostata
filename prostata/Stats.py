@@ -18,10 +18,10 @@ class NameNotExists(Exception):
 class Stats:
 
     def __init__(self):
-        self._timers = {}  # {name: {'start': datetime, 'stop': datetime, segments: int ,'elapsed': duration}}
-        self._counters = {}  # {name: {'value': amount, 'unit': unit}}
-        self._ratios = {}  # {name: {'numerator': name, 'denominator': name, 'value': ratio}}
-        self._attributes = {}  # {name: value}
+        self._timers = {}  # {name: {'start': datetime, 'stop': datetime, segments: int ,'elapsed': duration, 'label': str}}
+        self._counters = {}  # {name: {'value': amount, 'unit': unit, 'label': str}}
+        self._ratios = {}  # {name: {'numerator': name, 'denominator': name, 'value': ratio, 'label': str}}
+        self._attributes = {}  # {name: {'value': value, 'label': str}}
         self._names_used = set()  # Track all names to ensure uniqueness
 
     def is_used(self, name: str) -> bool:
@@ -65,12 +65,13 @@ class Stats:
         if self.is_used(name):
             raise NameExists(f"Name '{name}' already exists. Names cannot be repeated across timers, counters, ratios, and attributes.")
 
-    def set_timer(self, name: str):
+    def set_timer(self, name: str, label: str = None):
         """
         Create a new timer with the given name.
 
         Args:
             name (str): The name of the timer.
+            label (str, optional): The label for the timer. Defaults to the name if not provided.
 
         Raises:
             NameNotAllowed: If the name is a reserved word or has invalid format.
@@ -78,14 +79,16 @@ class Stats:
         """
         self._check_name_allowed(name)
         self._check_name_unique(name)
-        self._timers[name] = {'start': None, 'stop': None, 'segments': 0, 'elapsed': 0.0}
+        if label is None:
+            label = name
+        self._timers[name] = {'start': None, 'stop': None, 'segments': 0, 'elapsed': 0.0, 'label': label}
         self._names_used.add(name)
         # Add dynamic methods
         setattr(self, f'get_{name}', lambda: self.get_timer(name))
         setattr(self, f'start_{name}', lambda: self.start_timer(name))
         setattr(self, f'stop_{name}', lambda: self.stop_timer(name))
 
-    def set_counter(self, name: str, value: int = 0, unit: str = "item"):
+    def set_counter(self, name: str, value: int = 0, unit: str = "item", label: str = None):
         """
         Create a new counter with the given name, initial value, and unit.
 
@@ -93,6 +96,7 @@ class Stats:
             name (str): The name of the counter.
             value (int): The initial value. Defaults to 0.
             unit (str): The unit of the counter. Defaults to "item".
+            label (str, optional): The label for the counter. Defaults to the name if not provided.
 
         Raises:
             NameNotAllowed: If the name is a reserved word or has invalid format.
@@ -100,7 +104,9 @@ class Stats:
         """
         self._check_name_allowed(name)
         self._check_name_unique(name)
-        self._counters[name] = {'value': value, 'unit': unit}
+        if label is None:
+            label = name
+        self._counters[name] = {'value': value, 'unit': unit, 'label': label}
         self._names_used.add(name)
         # Add dynamic methods
         setattr(self, f'get_{name}', lambda: self.get_counter(name))
@@ -108,7 +114,7 @@ class Stats:
         setattr(self, f'decr_{name}', lambda amount=1: self.decr(name, amount))
         setattr(self, f'reset_{name}', lambda value=0: self.reset_counter(name, value))
 
-    def set_ratio(self, name: str, numerator: str, denominator: str):
+    def set_ratio(self, name: str, numerator: str, denominator: str, label: str = None):
         """
         Create a new ratio with the given name, numerator, and denominator.
 
@@ -116,6 +122,7 @@ class Stats:
             name (str): The name of the ratio.
             numerator (str): The name of the numerator counter.
             denominator (str): The name of the denominator counter.
+            label (str, optional): The label for the ratio. Defaults to the name if not provided.
 
         Raises:
             NameNotAllowed: If the name is a reserved word or has invalid format.
@@ -128,18 +135,21 @@ class Stats:
             raise NameNotExists(f"Numerator '{numerator}' does not exist.")
         if not self.is_used(denominator):
             raise NameNotExists(f"Denominator '{denominator}' does not exist.")
-        self._ratios[name] = {'numerator': numerator, 'denominator': denominator, 'value': 0.0}
+        if label is None:
+            label = name
+        self._ratios[name] = {'numerator': numerator, 'denominator': denominator, 'value': 0.0, 'label': label}
         self._names_used.add(name)
         # Add dynamic method
         setattr(self, f'get_{name}', lambda: self.get_ratio(name))
 
-    def set_attribute(self, name: str, value: Union[str, int, float] = ""):
+    def set_attribute(self, name: str, value: Union[str, int, float] = "", label: str = None):
         """
         Create a new attribute with the given name and value.
 
         Args:
             name (str): The name of the attribute.
             value (Union[str, int, float]): The value of the attribute. Defaults to "".
+            label (str, optional): The label for the attribute. Defaults to the name if not provided.
 
         Raises:
             NameNotAllowed: If the name is a reserved word or has invalid format.
@@ -147,7 +157,9 @@ class Stats:
         """
         self._check_name_allowed(name)
         self._check_name_unique(name)
-        self._attributes[name] = value
+        if label is None:
+            label = name
+        self._attributes[name] = {'value': value, 'label': label}
         self._names_used.add(name)
         # Add dynamic method
         setattr(self, f'get_{name}', lambda: self.get_attribute(name))
@@ -324,7 +336,7 @@ class Stats:
         """
         if name not in self._attributes:
             raise NameNotExists(f"Attribute '{name}' does not exist.")
-        return self._attributes[name]
+        return self._attributes[name]['value']
 
     def set_attribute_value(self, name: str, value: Union[str, int, float]):
         """
@@ -339,7 +351,7 @@ class Stats:
         """
         if name not in self._attributes:
             raise NameNotExists(f"Attribute '{name}' does not exist.")
-        self._attributes[name] = value
+        self._attributes[name]['value'] = value
 
     def get_timers(self) -> dict:
         """
@@ -421,3 +433,80 @@ class Stats:
             list: A list of all used names across timers, counters, ratios, and attributes.
         """
         return list(self._names_used)
+
+    def set_label(self, name: str, new_label: str):
+        """
+        Set a new label for an existing timer, counter, ratio, or attribute.
+
+        Args:
+            name (str): The name of the item to update.
+            new_label (str): The new label to set.
+
+        Raises:
+            NameNotExists: If the name does not exist.
+        """
+        if not self.is_used(name):
+            raise NameNotExists(f"Name '{name}' does not exist.")
+        
+        if name in self._timers:
+            self._timers[name]['label'] = new_label
+        elif name in self._counters:
+            self._counters[name]['label'] = new_label
+        elif name in self._ratios:
+            self._ratios[name]['label'] = new_label
+        elif name in self._attributes:
+            self._attributes[name]['label'] = new_label
+
+    def get_labels(self) -> dict:
+        """
+        Get all name/label pairs for all items.
+
+        Returns:
+            dict: A dictionary mapping names to their labels.
+        """
+        labels = {}
+        for name, timer in self._timers.items():
+            labels[name] = timer['label']
+        for name, counter in self._counters.items():
+            labels[name] = counter['label']
+        for name, ratio in self._ratios.items():
+            labels[name] = ratio['label']
+        for name, attr in self._attributes.items():
+            labels[name] = attr['label']
+        return labels
+
+    def get_labels_for_timers(self) -> dict:
+        """
+        Get all name/label pairs for timers.
+
+        Returns:
+            dict: A dictionary mapping timer names to their labels.
+        """
+        return {name: timer['label'] for name, timer in self._timers.items()}
+
+    def get_labels_for_counters(self) -> dict:
+        """
+        Get all name/label pairs for counters.
+
+        Returns:
+            dict: A dictionary mapping counter names to their labels.
+        """
+        return {name: counter['label'] for name, counter in self._counters.items()}
+
+    def get_labels_for_ratios(self) -> dict:
+        """
+        Get all name/label pairs for ratios.
+
+        Returns:
+            dict: A dictionary mapping ratio names to their labels.
+        """
+        return {name: ratio['label'] for name, ratio in self._ratios.items()}
+
+    def get_labels_for_attributes(self) -> dict:
+        """
+        Get all name/label pairs for attributes.
+
+        Returns:
+            dict: A dictionary mapping attribute names to their labels.
+        """
+        return {name: attr['label'] for name, attr in self._attributes.items()}
