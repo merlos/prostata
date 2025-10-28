@@ -70,7 +70,7 @@ jobs:
       run: |
         if [ "${{ github.event_name }}" = "release" ]; then
           # Deploy tagged version on release
-          VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//')
+          VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//' | sed 's/^releases\///' | sed 's/^release-//')
           mike deploy --push --update-aliases $VERSION latest
         else
           # Deploy latest on main branch pushes
