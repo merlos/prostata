@@ -73,6 +73,6 @@ jobs:
           VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//' | sed 's/^releases\///' | sed 's/^release-//')
           mike deploy --push --update-aliases $VERSION latest
         else
-          # Deploy latest on main branch pushes
-          mike deploy --push latest
+          # Deploy development on main branch pushes
+          mike deploy --push development
         fi
