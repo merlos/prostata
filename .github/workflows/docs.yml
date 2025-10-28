@@ -73,6 +73,10 @@ jobs:
         git config --global user.name 'Prostata Doc Bot'
         git config --global user.email 'merlos@users.noreply.github.com'
 
+    - name: Fetch gh-pages branch
+      run: |
+        git fetch origin gh-pages:gh-pages || true
+
     - name: Deploy with mike
       run: |
         if [ "${{ github.event_name }}" = "release" ]; then
