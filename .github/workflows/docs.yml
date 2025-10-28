@@ -68,18 +68,16 @@ jobs:
 
     - name: Configure git
       run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git config --global user.name 'Prostata Doc Bot'
+        git config --global user.email 'merlos@users.noreply.github.com'
 
     - name: Deploy with mike
-      env:
-        GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
       run: |
         if [ "${{ github.event_name }}" = "release" ]; then
           # Deploy tagged version on release
           VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//' | sed 's/^releases\///' | sed 's/^release-//')
-          mike deploy --push --token $GIT_TOKEN --update-aliases $VERSION latest
+          mike deploy --push --update-aliases $VERSION latest
         else
           # Deploy development on main branch pushes
-          mike deploy --push --token $GIT_TOKEN development
+          mike deploy --push development
         fi
