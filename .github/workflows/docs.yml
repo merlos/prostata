@@ -40,14 +40,6 @@ jobs:
         pip install -e .[dev]
         pip install mike
 
-    - name: Build documentation
-      run: mkdocs build
-
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v4
-      with:
-        path: ./site
-
   deploy:
     if: github.ref == 'refs/heads/main' || github.event_name == 'release'
     environment:
@@ -73,17 +65,6 @@ jobs:
       run: |
         pip install mike
         pip install -e .[dev]
-
-    - name: Download artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: github-pages
-        path: ./site
-
-    - name: Configure git
-      run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
     - name: Deploy with mike
       run: |
